@@ -3,6 +3,7 @@
 # Downloads the standalone mesh.exe, verifies its SHA-256 checksum, then runs "mesh install"
 # (user PATH + Tab completion). No Node.js needed.
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'   # the progress bar of Windows PowerShell 5.1 makes downloads many times slower
 # Windows PowerShell 5.1 defaults to TLS 1.0/1.1, which GitHub rejects ("connection was closed unexpectedly").
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch { }
 $Repo = if ($env:MESHCLI_REPO) { $env:MESHCLI_REPO } else { 'Sintzy/meshctCLI' }   # <-- GitHub "owner/repo"
