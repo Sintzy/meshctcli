@@ -1,7 +1,7 @@
 {
   "name": "meshcentral-cli",
-  "version": "1.0.1",
-  "description": "MeshctCLI \u2014 a modern, cross-platform terminal client for MeshCentral servers.",
+  "version": "1.0.2",
+  "description": "MeshctCLI — a modern, cross-platform terminal client for MeshCentral servers.",
   "type": "module",
   "bin": {
     "mesh": "bin/mesh.js",
