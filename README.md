@@ -47,8 +47,10 @@ curl -fsSL https://github.com/Sintzy/meshctCLI/releases/latest/download/install.
 **Windows (PowerShell)**
 
 ```powershell
-irm https://github.com/Sintzy/meshctCLI/releases/latest/download/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://github.com/Sintzy/meshctCLI/releases/latest/download/install.ps1 | iex
 ```
+
+The first part enables TLS 1.2, which Windows PowerShell 5.1 needs to talk to GitHub; it is harmless on PowerShell 7.
 
 Then:
 

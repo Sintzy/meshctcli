@@ -1,8 +1,10 @@
 # MeshCLI one-line installer for Windows (PowerShell 5.1+ / 7):
-#   irm https://github.com/Sintzy/meshctCLI/releases/latest/download/install.ps1 | iex
+#   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://github.com/Sintzy/meshctCLI/releases/latest/download/install.ps1 | iex
 # Downloads the standalone mesh.exe, verifies its SHA-256 checksum, then runs "mesh install"
 # (user PATH + Tab completion). No Node.js needed.
 $ErrorActionPreference = 'Stop'
+# Windows PowerShell 5.1 defaults to TLS 1.0/1.1, which GitHub rejects ("connection was closed unexpectedly").
+try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch { }
 $Repo = if ($env:MESHCLI_REPO) { $env:MESHCLI_REPO } else { 'Sintzy/meshctCLI' }   # <-- GitHub "owner/repo"
 $Version = if ($env:MESHCLI_VERSION) { $env:MESHCLI_VERSION } else { 'latest' }
 
