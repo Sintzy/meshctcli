@@ -11,7 +11,7 @@
   <a href="https://github.com/Sintzy/meshctCLI/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/Sintzy/meshctCLI/total?style=flat-square"></a>
   <img alt="Platforms" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-informational?style=flat-square">
   <img alt="MeshCentral" src="https://img.shields.io/badge/MeshCentral-1.3.1-blue?style=flat-square">
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-PolyForm%20Noncommercial-orange?style=flat-square"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-PolyForm%20Shield-orange?style=flat-square"></a>
 </p>
 
 ```console
@@ -137,8 +137,6 @@ npm run build                                # single file dist/mesh.cjs
 Windows with Node 18 and 24, then the release with the installer scripts. The code is split by concern (`src/mesh` protocol and devices, `src/session` shell,
 files and tunnels, `src/auth` keyrings, `src/ui` terminal output, `src/commands`).
 
-What is and is not verified yet is tracked honestly in [TEST-RESULTS.md](TEST-RESULTS.md).
-
 ## Notes
 
 MeshctCLI talks to MeshCentral's control and relay protocol directly, the same one the web UI and the
@@ -147,11 +145,13 @@ checked against the MeshCentral 1.3.1 source. This project is not affiliated wit
 
 ## License
 
-MeshctCLI is **source-available, not open source**. It is licensed under the
-[PolyForm Noncommercial License 1.0.0](LICENSE): you may use, study, change and share it for any
-noncommercial purpose (personal use, hobby projects, research, education, charities and similar
-organizations). **You may not use it commercially or sell it**, and that includes selling the software, a modified version of it, or a service built on it. For a commercial license, contact the author through the
-[GitHub repository](https://github.com/Sintzy/meshctCLI).
+MeshctCLI is **source-available, not open source**, under the
+[PolyForm Shield License 1.0.0](LICENSE).
 
-Bundled third-party software and its licenses: [THIRD-PARTY.md](THIRD-PARTY.md). This project is not
-affiliated with MeshCentral.
+- **You can** use it for any purpose, **including inside your company or for your clients**, read the code,
+  change it and share it with the license notice.
+- **You can't** sell it, or sell a modified version of it, or use it to offer a product or service that
+  competes with MeshctCLI.
+
+For anything else, contact the author through the [GitHub repository](https://github.com/Sintzy/meshctCLI).
+Bundled third-party software and its licenses: [THIRD-PARTY.md](THIRD-PARTY.md).

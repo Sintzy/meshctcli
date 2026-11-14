@@ -1,7 +1,7 @@
 {
   "name": "meshcentral-cli",
   "version": "1.0.2",
-  "description": "MeshctCLI — a modern, cross-platform terminal client for MeshCentral servers.",
+  "description": "MeshctCLI \u2014 a modern, cross-platform terminal client for MeshCentral servers.",
   "type": "module",
   "bin": {
     "mesh": "bin/mesh.js",
@@ -20,7 +20,6 @@
   "scripts": {
     "test": "node --test",
     "test:integration": "node scripts/integration.mjs",
-    "bundle-txt": "node scripts/bundle-txt.mjs",
     "build": "node scripts/build.mjs"
   },
   "keywords": [
@@ -31,7 +30,7 @@
     "terminal",
     "remote-desktop"
   ],
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "PolyForm-Shield-1.0.0",
   "dependencies": {
     "ws": "^8.18.0"
   },
