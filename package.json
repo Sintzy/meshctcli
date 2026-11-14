@@ -1,0 +1,48 @@
+{
+  "name": "meshcentral-cli",
+  "version": "1.0.0",
+  "description": "MeshCLI \u2014 a modern, cross-platform terminal client for MeshCentral servers.",
+  "type": "module",
+  "bin": {
+    "mesh": "bin/mesh.js",
+    "meshcli": "bin/mesh.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "test": "node --test",
+    "test:integration": "node scripts/integration.mjs",
+    "bundle-txt": "node scripts/bundle-txt.mjs",
+    "build": "node scripts/build.mjs"
+  },
+  "keywords": [
+    "meshcentral",
+    "remote",
+    "cli",
+    "rdm",
+    "terminal",
+    "remote-desktop"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sintzy/meshctCLI.git"
+  },
+  "homepage": "https://github.com/Sintzy/meshctCLI#readme",
+  "bugs": {
+    "url": "https://github.com/Sintzy/meshctCLI/issues"
+  }
+}

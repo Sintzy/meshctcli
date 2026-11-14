@@ -1,0 +1,6 @@
+node_modules/
+test-results/
+*.tgz
+MeshCLI-source.txt
+MeshCLI.zip
+dist/
