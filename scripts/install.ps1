@@ -33,8 +33,17 @@ try {
     $file = Join-Path $tmp 'mesh.cjs'
     Write-Host "  INFO  Using Node.js v$nodeVersion. Downloading MeshCLI ..."
     Invoke-WebRequest "$base/mesh.cjs" -OutFile $file -UseBasicParsing
-    $expected = ((Invoke-WebRequest "$base/mesh.cjs.sha256" -UseBasicParsing).Content.ToString().Trim() -split '\s+')[0]
+    # Download to a file: GitHub serves .sha256 as application/octet-stream, so "(Invoke-WebRequest).Content"
+    # is a byte[] in Windows PowerShell and cannot be compared as text.
+    $sumFile = Join-Path $tmp 'mesh.cjs.sha256'
+    Invoke-WebRequest "$base/mesh.cjs.sha256" -OutFile $sumFile -UseBasicParsing
+    $expected = ((Get-Content $sumFile -Raw).Trim() -split '\s+')[0]
     $actual = (Get-FileHash $file -Algorithm SHA256).Hash
-    if ($expected.ToLower() -ne $actual.ToLower()) { Write-Host ' FAIL   Checksum mismatch; refusing to install.' -ForegroundColor Red; return }
+    if ($expected.ToLower() -ne $actual.ToLower()) {
+        Write-Host ' FAIL   Checksum mismatch; refusing to install.' -ForegroundColor Red
+        Write-Host "        expected $expected"
+        Write-Host "        got      $actual"
+        return
+    }
     & node $file install
 } finally { Remove-Item $tmp -Recurse -Force -ErrorAction SilentlyContinue }
