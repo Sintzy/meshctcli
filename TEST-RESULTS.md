@@ -1,4 +1,4 @@
-# MeshCLI test results — 2026-11-14
+# MeshctCLI test results — 2026-11-14
 
 Environment: macOS 26.6 (Apple Silicon), Node.js 24.19.0, zsh 5.9, GNU bash 5.3.
 
@@ -16,7 +16,7 @@ Run without any server.
 | CLI subprocess | help/version, unknown option → exit 2, `__complete` answers from cache only (unroutable server configured), not logged in in a script → exit 3 without prompting |
 | Storage | config save/load (mode 0600), profile resolution, env-variable credentials, file credential store round trip, token expiry |
 
-The mock server is a simulation. It shows that MeshCLI follows the protocol as I read it in the
+The mock server is a simulation. It shows that MeshctCLI follows the protocol as I read it in the
 MeshCentral source. It does **not** prove that a real server behaves the same, which is what
 section 2 is for.
 

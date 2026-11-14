@@ -109,7 +109,7 @@ test('CLI: help, version, usage errors and exit codes', () => {
   const help = mesh(['help']);
   assert.equal(help.status, 0);
   assert.match(help.stdout, /mesh <device>/);
-  assert.match(mesh(['--version']).stdout, /^MeshCLI \d+\.\d+\.\d+/);
+  assert.match(mesh(['--version']).stdout, /^MeshctCLI \d+\.\d+\.\d+/);
   const bad = mesh(['list', '--nope']);
   assert.equal(bad.status, 2);
   assert.match(bad.stderr, /FAIL +Unknown option '--nope'\./);

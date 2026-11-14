@@ -73,7 +73,7 @@ export function appModeArgs(url, { profileDir = paths.browserProfile, width = 14
     '--no-first-run',
     '--no-default-browser-check',
     '--disable-features=TranslateUI',
-    '--class=MeshCLI',
+    '--class=MeshctCLI',
   ];
 }
 
@@ -91,7 +91,7 @@ export function writeRedirectPage(url) {
   }
   const file = path.join(dir, `open-${process.pid}-${Date.now()}.html`);
   const safe = JSON.stringify(url).replace(/</g, '\\u003c');
-  fs.writeFileSync(file, `<!doctype html><meta charset="utf-8"><title>MeshCLI</title><meta name="referrer" content="no-referrer"><script>location.replace(${safe});</script>`, { mode: 0o600 });
+  fs.writeFileSync(file, `<!doctype html><meta charset="utf-8"><title>MeshctCLI</title><meta name="referrer" content="no-referrer"><script>location.replace(${safe});</script>`, { mode: 0o600 });
   return { url: pathToFileURL(file).toString(), file, cleanup: () => { try { fs.unlinkSync(file); } catch { /* ignore */ } } };
 }
 

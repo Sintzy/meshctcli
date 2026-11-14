@@ -40,11 +40,11 @@ function check(name, fn) {
 }
 const must = (r, what) => { if (r.status !== 0) throw new Error(`${what} exited ${r.status}: ${(r.stderr || r.stdout).trim().split('\n').slice(-2).join(' ')}`); return r; };
 
-console.log(`MeshCLI integration test (REAL server) - device "${device}"\n`);
+console.log(`MeshctCLI integration test (REAL server) - device "${device}"\n`);
 {
   const pre = mesh(['status', '--offline']);
   if (pre.status !== 0 || /Not logged in/.test(pre.stdout)) {
-    console.error(`${(pre.stderr || pre.stdout).trim()}\n\nSet MeshCLI up first (same terminal, same user):\n  mesh configure\n  mesh login`);
+    console.error(`${(pre.stderr || pre.stdout).trim()}\n\nSet MeshctCLI up first (same terminal, same user):\n  mesh configure\n  mesh login`);
     console.error('\nNote: if "mesh" still prints Portuguese text, your shell is running the old prototype function; open a new terminal.');
     process.exit(2);
   }

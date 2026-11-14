@@ -234,9 +234,9 @@ test('launcher scripts require Node and never embed it', async () => {
   assert.match(unix, /Node\.js 18\.17 or newer is required/);
   assert.match(unix, /exec node "\/home\/u\/\.local\/share\/meshcli\/mesh\.cjs" "\$@"/);
   assert.match(launcherScript('/a "b"/$x/mesh.cjs', 'linux'), /exec node "\/a \\"b\\"\/\\\$x\/mesh\.cjs"/);
-  const win = launcherScript('C:\\Users\\u\\AppData\\Local\\Programs\\MeshCLI\\mesh.cjs', 'win32');
+  const win = launcherScript('C:\\Users\\u\\AppData\\Local\\Programs\\MeshctCLI\\mesh.cjs', 'win32');
   assert.match(win, /where node/);
-  assert.match(win, /node "C:\\Users\\u\\AppData\\Local\\Programs\\MeshCLI\\mesh\.cjs" %\*/);
+  assert.match(win, /node "C:\\Users\\u\\AppData\\Local\\Programs\\MeshctCLI\\mesh\.cjs" %\*/);
   assert.ok(win.includes('\r\n'));
 });
 

@@ -1,4 +1,4 @@
-<h1 align="center">MeshCLI</h1>
+<h1 align="center">MeshctCLI</h1>
 
 <p align="center">
   Control every machine on your <a href="https://github.com/Ylianst/MeshCentral">MeshCentral</a> server from the terminal.<br>
@@ -11,6 +11,7 @@
   <a href="https://github.com/Sintzy/meshctCLI/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/Sintzy/meshctCLI/total?style=flat-square"></a>
   <img alt="Platforms" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-informational?style=flat-square">
   <img alt="MeshCentral" src="https://img.shields.io/badge/MeshCentral-1.3.1-blue?style=flat-square">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-PolyForm%20Noncommercial-orange?style=flat-square"></a>
 </p>
 
 ```console
@@ -35,7 +36,7 @@ $ mesh                                          # no argument: pick a device wit
 
 ## Install
 
-**Requires [Node.js](https://nodejs.org/) 18.17 or newer.** MeshCLI never installs or downloads Node.js:
+**Requires [Node.js](https://nodejs.org/) 18.17 or newer.** MeshctCLI never installs or downloads Node.js:
 if it is missing or too old, the installer stops and tells you so. Otherwise it downloads one small file
 (about 300 KB), verifies its SHA-256 checksum, adds the `mesh` command to your `PATH` and sets up Tab completion.
 
@@ -104,7 +105,7 @@ All commands: `mesh help`. Per-command usage: `mesh help <command>`.
 
 ## Remote desktop in a browser window
 
-MeshCentral has no documented URL for "open the desktop", so MeshCLI only uses mechanisms the server
+MeshCentral has no documented URL for "open the desktop", so MeshctCLI only uses mechanisms the server
 already provides:
 
 1. `/?node=<id>&viewmode=11&hide=23` is the link the web UI itself uses for "open in new window".
@@ -140,6 +141,17 @@ What is and is not verified yet is tracked honestly in [TEST-RESULTS.md](TEST-RE
 
 ## Notes
 
-MeshCLI talks to MeshCentral's control and relay protocol directly, the same one the web UI and the
+MeshctCLI talks to MeshCentral's control and relay protocol directly, the same one the web UI and the
 official `meshctrl` use. That protocol is not a formally versioned API, so every message used was
 checked against the MeshCentral 1.3.1 source. This project is not affiliated with MeshCentral.
+
+## License
+
+MeshctCLI is **source-available, not open source**. It is licensed under the
+[PolyForm Noncommercial License 1.0.0](LICENSE): you may use, study, change and share it for any
+noncommercial purpose (personal use, hobby projects, research, education, charities and similar
+organizations). **You may not use it commercially or sell it**, and that includes selling the software, a modified version of it, or a service built on it. For a commercial license, contact the author through the
+[GitHub repository](https://github.com/Sintzy/meshctCLI).
+
+Bundled third-party software and its licenses: [THIRD-PARTY.md](THIRD-PARTY.md). This project is not
+affiliated with MeshCentral.

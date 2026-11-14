@@ -37,7 +37,7 @@ const completion = {
   },
 };
 
-const version = { name: 'version', summary: 'Show the MeshCLI version', usage: 'mesh version', run: () => t.print(`MeshCLI ${VERSION} (Node.js ${process.version})`) };
+const version = { name: 'version', summary: 'Show the MeshctCLI version', usage: 'mesh version', run: () => t.print(`MeshctCLI ${VERSION} (Node.js ${process.version})`) };
 
 const help = {
   name: 'help',
@@ -78,7 +78,7 @@ export function printHelp(name) {
     t.print();
     return;
   }
-  t.title(`MeshCLI ${VERSION}`, 'Command line client for MeshCentral');
+  t.title(`MeshctCLI ${VERSION}`, 'Command line client for MeshCentral');
   t.section('Usage');
   t.print(`  mesh ${t.c.cyan('<device>')}               open a shell on a device (PowerShell on Windows)`);
   t.print(`  mesh                        pick a device interactively`);

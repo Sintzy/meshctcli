@@ -16,7 +16,7 @@ const isWindows = process.platform === 'win32';
 
 /** Folder with the launcher (this folder goes on the PATH). */
 export const defaultBinDir = () => (isWindows
-  ? path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'Programs', 'MeshCLI')
+  ? path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'Programs', 'MeshctCLI')
   : path.join(os.homedir(), '.local', 'bin'));
 
 /** Folder with mesh.cjs. On Windows it is the same folder as the launcher. */
@@ -65,7 +65,7 @@ function removeFromPath(dir) {
   const actions = [];
   if (isWindows) {
     const r = powershell("$p=[Environment]::GetEnvironmentVariable('Path','User'); $n=(($p -split ';') | Where-Object { $_ -and $_ -ne $env:MESHCLI_DIR }) -join ';'; [Environment]::SetEnvironmentVariable('Path', $n, 'User')", { MESHCLI_DIR: dir });
-    if (r.status === 0) actions.push('removed MeshCLI from your user PATH');
+    if (r.status === 0) actions.push('removed MeshctCLI from your user PATH');
     return actions;
   }
   for (const shell of ['zsh', 'bash']) {
@@ -74,7 +74,7 @@ function removeFromPath(dir) {
     const text = fs.readFileSync(rc, 'utf8');
     if (!text.includes(PATH_MARKER)) continue;
     fs.writeFileSync(rc, text.split('\n').filter((l) => !l.includes(PATH_MARKER)).join('\n'));
-    actions.push(`removed the MeshCLI PATH line from ${rc}`);
+    actions.push(`removed the MeshctCLI PATH line from ${rc}`);
   }
   return actions;
 }
@@ -93,7 +93,7 @@ export const installCmd = {
     const libDir = opts.dir && !isWindows ? binDir : defaultLibDir();
     const libFile = path.join(libDir, 'mesh.cjs');
     const launcher = path.join(binDir, isWindows ? 'mesh.cmd' : 'mesh');
-    t.title('MeshCLI', `Installing to ${binDir}`);
+    t.title('MeshctCLI', `Installing to ${binDir}`);
     fs.mkdirSync(binDir, { recursive: true });
     fs.mkdirSync(libDir, { recursive: true });
     if (path.resolve(self) !== libFile) fs.copyFileSync(self, libFile);
@@ -107,7 +107,7 @@ export const installCmd = {
       const r = installCompletion();
       for (const a of r.actions) t.status('ok', a);
     }
-    t.result('ok', 'MeshCLI installed.');
+    t.result('ok', 'MeshctCLI installed.');
     t.detail(`Open a new terminal, then run: mesh configure${onPath(binDir) ? '' : '   (PATH changes apply to new terminals)'}`, 7);
   },
 };
@@ -131,7 +131,7 @@ function removeLegacyPrototype() {
 
 export const uninstallCmd = {
   name: 'uninstall',
-  summary: 'Remove MeshCLI: executable, PATH entry, completion (--purge: also settings and credentials)',
+  summary: 'Remove MeshctCLI: executable, PATH entry, completion (--purge: also settings and credentials)',
   usage: 'mesh uninstall [--purge] [--yes]',
   options: { purge: { type: 'boolean' } },
   async run(_ctx, { opts }) {
@@ -164,7 +164,7 @@ export const uninstallCmd = {
       actions.push(...removeFromPath(binDir));
     }
     for (const a of actions) t.status('ok', a);
-    t.result('ok', actions.length ? 'MeshCLI removed.' : 'Nothing to remove.');
+    t.result('ok', actions.length ? 'MeshctCLI removed.' : 'Nothing to remove.');
     t.detail('Server-side login tokens stay valid until revoked: MeshCentral > My Account > Login Tokens.', 7);
   },
 };

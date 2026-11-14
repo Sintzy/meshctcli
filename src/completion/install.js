@@ -1,4 +1,4 @@
-// Install/uninstall shell completion: the script lives in the MeshCLI config folder and the shell
+// Install/uninstall shell completion: the script lives in the MeshctCLI config folder and the shell
 // start-up file gets exactly one marked line (fish needs none: it autoloads completion files).
 import fs from 'node:fs';
 import os from 'node:os';
@@ -46,7 +46,7 @@ export function sourceLine(shell, scriptPath) {
 /** Add our line to an rc file's text (idempotent); comment out the legacy prototype line. */
 export function patchRcText(text, line) {
   let changedLegacy = false;
-  let out = text.replace(LEGACY_PATTERN, (m) => { changedLegacy = true; return `# ${m}  # disabled by MeshCLI (replaced by the line below)`; });
+  let out = text.replace(LEGACY_PATTERN, (m) => { changedLegacy = true; return `# ${m}  # disabled by MeshctCLI (replaced by the line below)`; });
   const lines = out.split('\n').filter((l) => !l.includes(MARKER));
   out = lines.join('\n');
   if (out.length && !out.endsWith('\n')) out += '\n';
@@ -101,7 +101,7 @@ export function uninstall(shell = detectShell()) {
   if (rc && fs.existsSync(rc)) {
     const before = fs.readFileSync(rc, 'utf8');
     const after = unpatchRcText(before);
-    if (after !== before) { fs.writeFileSync(rc, after); actions.push(`removed the MeshCLI line from ${rc}`); }
+    if (after !== before) { fs.writeFileSync(rc, after); actions.push(`removed the MeshctCLI line from ${rc}`); }
   }
   const ext = shell === 'powershell' ? 'ps1' : shell;
   const scriptPath = path.join(paths.completionDir, `mesh.${ext}`);

@@ -76,7 +76,7 @@ export function resolveProfile(config, requested, env = process.env) {
 export function requireProfile(config, requested) {
   const resolved = resolveProfile(config, requested);
   if (!resolved || !resolved.profile.url) {
-    throw new UsageError('MeshCLI is not configured yet.', { hint: 'Run "mesh configure" to set up a MeshCentral server.' });
+    throw new UsageError('MeshctCLI is not configured yet.', { hint: 'Run "mesh configure" to set up a MeshCentral server.' });
   }
   return resolved;
 }

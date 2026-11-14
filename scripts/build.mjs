@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Build the single-file distribution of MeshCLI: dist/mesh.cjs (+ dist/mesh.cjs.sha256).
+// Build the single-file distribution of MeshctCLI: dist/mesh.cjs (+ dist/mesh.cjs.sha256).
 //
 //   npm run build
 //
@@ -21,7 +21,7 @@ fs.mkdirSync(dist, { recursive: true });
 // version module (kept in sync with package.json)
 fs.writeFileSync(path.join(root, 'src', 'version.js'), `// Generated from package.json by scripts/build.mjs (kept in sync by a unit test).\nexport const VERSION = '${pkg.version}';\n`);
 
-const guard = 'var __v=process.versions.node.split(".").map(Number);if(__v[0]<18||(__v[0]===18&&__v[1]<17)){console.error(" FAIL   MeshCLI needs Node.js 18.17 or newer (found "+process.version+"). Get it at https://nodejs.org/");process.exit(1)}';
+const guard = 'var __v=process.versions.node.split(".").map(Number);if(__v[0]<18||(__v[0]===18&&__v[1]<17)){console.error(" FAIL   MeshctCLI needs Node.js 18.17 or newer (found "+process.version+"). Get it at https://nodejs.org/");process.exit(1)}';
 
 const out = path.join(dist, 'mesh.cjs');
 await build({

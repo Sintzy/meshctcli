@@ -49,7 +49,7 @@ test('device list, run command, login cookie, login token', async () => {
   assert.equal(await c.runCommand('node//win1', 'whoami', { type: 2 }), 'ran(2): whoami');
   await assert.rejects(c.runCommand('node//lin1', 'x'), /Agent not connected/);
   assert.equal(await c.loginCookie(), 'L0GIN');
-  const tok = await c.createLoginToken({ name: 'MeshCLI test', expireMinutes: 60 });
+  const tok = await c.createLoginToken({ name: 'MeshctCLI test', expireMinutes: 60 });
   assert.equal(tok.user, '~t:abc');
   assert.ok(tok.expire > 0);
   c.close();

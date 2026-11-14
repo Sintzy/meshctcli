@@ -42,7 +42,7 @@ export const configure = {
     const existingName = opts.profile || config.defaultProfile || 'default';
     const name = validateProfileName(opts.profile || (interactive && !opts.url ? await ask('Profile name', { default: existingName }) : existingName));
     const prev = config.profiles[name] || { ...PROFILE_DEFAULTS };
-    t.title('MeshCLI configuration', `Profile "${name}"`);
+    t.title('MeshctCLI configuration', `Profile "${name}"`);
 
     // Server URL + TLS
     const urlInput = opts.url || (interactive ? await ask('MeshCentral server URL', { default: prev.url ? hostLabel(prev.url) : undefined, validate: (v) => { try { normalizeServerUrl(v); return null; } catch (e) { return e.message; } } }) : null);
@@ -193,7 +193,7 @@ export const login = {
     let record = null;
     if (!opts['password-only']) {
       try {
-        const token = await client.createLoginToken({ name: `MeshCLI ${os.hostname()}`.slice(0, 100), expireMinutes: Math.round(expireDays * 1440) });
+        const token = await client.createLoginToken({ name: `MeshctCLI ${os.hostname()}`.slice(0, 100), expireMinutes: Math.round(expireDays * 1440) });
         record = { kind: 'token', user: token.user, secret: token.password, owner: user, tokenName: token.name, expire: token.expire || 0 };
         t.status('ok', `Login token "${token.name}" created${token.expire ? `, expires ${new Date(token.expire).toLocaleDateString()}` : ', no expiry'}.`);
       } catch (err) {
@@ -234,7 +234,7 @@ export const login = {
       }
     }
     if (previous?.kind === 'token' && previous.user !== record.user) {
-      try { await client.listLoginTokens({ remove: [previous.user] }); t.status('ok', 'Previous MeshCLI login token revoked.'); } catch { /* non fatal */ }
+      try { await client.listLoginTokens({ remove: [previous.user] }); t.status('ok', 'Previous MeshctCLI login token revoked.'); } catch { /* non fatal */ }
     }
     client.close();
     if (record.kind === 'token') {

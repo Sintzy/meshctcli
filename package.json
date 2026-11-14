@@ -1,7 +1,7 @@
 {
   "name": "meshcentral-cli",
   "version": "1.0.1",
-  "description": "MeshCLI — a modern, cross-platform terminal client for MeshCentral servers.",
+  "description": "MeshctCLI \u2014 a modern, cross-platform terminal client for MeshCentral servers.",
   "type": "module",
   "bin": {
     "mesh": "bin/mesh.js",
@@ -10,7 +10,9 @@
   "files": [
     "bin",
     "src",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "THIRD-PARTY.md"
   ],
   "engines": {
     "node": ">=18.17"
@@ -29,7 +31,7 @@
     "terminal",
     "remote-desktop"
   ],
-  "license": "UNLICENSED",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "dependencies": {
     "ws": "^8.18.0"
   },

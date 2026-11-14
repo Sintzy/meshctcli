@@ -24,7 +24,7 @@ export const doctor = {
     const results = [];
     const check = (kind, text, meta) => { results.push(kind); t.item(kind, text, meta); };
 
-    t.title('MeshCLI doctor', `Node.js ${process.version} on ${process.platform}/${process.arch}`);
+    t.title('MeshctCLI doctor', `Node.js ${process.version} on ${process.platform}/${process.arch}`);
     t.section('Local');
     const [major, minor] = process.versions.node.split('.').map(Number);
     check(major > 18 || (major === 18 && minor >= 17) ? 'ok' : 'fail', `Node.js ${process.version}`, major >= 18 ? undefined : 'requires 18.17 or newer');

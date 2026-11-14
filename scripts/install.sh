@@ -1,8 +1,8 @@
 #!/bin/sh
-# MeshCLI one-line installer for macOS and Linux:
+# MeshctCLI one-line installer for macOS and Linux:
 #   curl -fsSL https://github.com/Sintzy/meshctCLI/releases/latest/download/install.sh | sh
 #
-# MeshCLI REQUIRES Node.js 18.17+ and never installs it for you. If Node.js is missing or too
+# MeshctCLI REQUIRES Node.js 18.17+ and never installs it for you. If Node.js is missing or too
 # old, this script stops. Otherwise it downloads mesh.cjs (a ~300 KB file), verifies its SHA-256
 # checksum, then runs "mesh install" (command on your PATH + Tab completion).
 set -eu
@@ -17,7 +17,7 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 if ! node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>18||(a===18&&b>=17)?0:1)'; then
-  echo " FAIL   Node.js $(node -v) is too old; MeshCLI needs 18.17 or newer." >&2
+  echo " FAIL   Node.js $(node -v) is too old; MeshctCLI needs 18.17 or newer." >&2
   echo "        Update it from https://nodejs.org/ and run this again." >&2
   exit 1
 fi
@@ -29,7 +29,7 @@ else base="https://github.com/$REPO/releases/download/$VERSION"; fi
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT INT TERM
 fetch() { if command -v curl >/dev/null 2>&1; then curl -fsSL "$1" -o "$2"; else wget -q "$1" -O "$2"; fi; }
 
-echo "  INFO  Using Node.js $(node -v). Downloading MeshCLI ..."
+echo "  INFO  Using Node.js $(node -v). Downloading MeshctCLI ..."
 fetch "$base/mesh.cjs" "$tmp/mesh.cjs" || { echo " FAIL   Download failed: $base/mesh.cjs" >&2; exit 1; }
 fetch "$base/mesh.cjs.sha256" "$tmp/mesh.cjs.sha256" || { echo " FAIL   Checksum download failed." >&2; exit 1; }
 

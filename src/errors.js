@@ -1,4 +1,4 @@
-// Error types and process exit codes used across MeshCLI.
+// Error types and process exit codes used across MeshctCLI.
 
 export const EXIT = Object.freeze({
   OK: 0,

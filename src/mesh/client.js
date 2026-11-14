@@ -60,7 +60,7 @@ export class MeshClient extends EventEmitter {
       let settled = false;
       const ws = new WebSocketImpl(url, {
         ...tlsOptions(profile),
-        headers: { 'x-meshauth': meshAuthHeader(auth), 'User-Agent': 'MeshCLI' },
+        headers: { 'x-meshauth': meshAuthHeader(auth), 'User-Agent': 'MeshctCLI' },
         handshakeTimeout: timeout,
         perMessageDeflate: false,
       });

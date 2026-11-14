@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Concatenate the source into one plain-text file (MeshCLI-source.txt) for easy copying/review.
+// Concatenate the source into one plain-text file (MeshctCLI-source.txt) for easy copying/review.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,10 +16,10 @@ const walk = (dir) => {
 ['package.json', 'README.md'].forEach((f) => files.push(f));
 ['bin', 'src', 'scripts', 'test'].forEach(walk);
 
-const out = [`MeshCLI source bundle — generated ${new Date().toISOString()}`, `Files: ${files.length}`, '', ...files.map((f) => `  ${f}`), ''];
+const out = [`MeshctCLI source bundle — generated ${new Date().toISOString()}`, `Files: ${files.length}`, '', ...files.map((f) => `  ${f}`), ''];
 for (const f of files) {
   out.push('='.repeat(100), `FILE: ${f.split(path.sep).join('/')}`, '='.repeat(100), fs.readFileSync(path.join(root, f), 'utf8'), '');
 }
-const target = path.join(root, 'MeshCLI-source.txt');
+const target = path.join(root, 'MeshctCLI-source.txt');
 fs.writeFileSync(target, out.join('\n'));
 console.log(`Wrote ${target} (${files.length} files)`);

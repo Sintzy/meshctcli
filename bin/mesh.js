@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// MeshCLI executable (installed as "mesh" and "meshcli").
+// MeshctCLI executable (installed as "mesh" and "meshcli").
 import { main } from '../src/cli/main.js';
 
 // Always give the cursor back (the picker hides it), even after an unexpected exit.

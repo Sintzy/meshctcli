@@ -39,7 +39,7 @@ const macos = {
     return decode(r.stdout);
   },
   set(account, secret) {
-    const cmd = `add-generic-password -U -a "${assertSafe(account)}" -s "${SERVICE}" -l "MeshCLI (${account})" -j "MeshCentral credentials stored by MeshCLI" -w "${encode(secret)}"\n`;
+    const cmd = `add-generic-password -U -a "${assertSafe(account)}" -s "${SERVICE}" -l "MeshctCLI (${account})" -j "MeshCentral credentials stored by MeshctCLI" -w "${encode(secret)}"\n`;
     const r = run('/usr/bin/security', ['-i'], { input: cmd });
     if (r.status !== 0 || /error|could not/i.test(r.stderr)) throw new MeshError(`Keychain write failed: ${r.stderr.trim() || `exit ${r.status}`}`);
   },
@@ -179,7 +179,7 @@ const linux = {
     return decode(r.stdout);
   },
   set(account, secret) {
-    const r = run('secret-tool', ['store', `--label=MeshCLI (${account})`, 'service', SERVICE, 'account', assertSafe(account)], { input: encode(secret) });
+    const r = run('secret-tool', ['store', `--label=MeshctCLI (${account})`, 'service', SERVICE, 'account', assertSafe(account)], { input: encode(secret) });
     if (r.status !== 0) throw new MeshError(`Secret Service write failed: ${r.stderr.trim() || `exit ${r.status}`}`, { hint: 'Is a keyring daemon (gnome-keyring, KWallet) running and unlocked?' });
   },
   delete(account) { return run('secret-tool', ['clear', 'service', SERVICE, 'account', assertSafe(account)]).status === 0; },

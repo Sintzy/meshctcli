@@ -1,7 +1,7 @@
-# MeshCLI one-line installer for Windows (PowerShell 5.1+ / 7):
+# MeshctCLI one-line installer for Windows (PowerShell 5.1+ / 7):
 #   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://github.com/Sintzy/meshctCLI/releases/latest/download/install.ps1 | iex
 #
-# MeshCLI REQUIRES Node.js 18.17+ and never installs it for you. If Node.js is missing or too
+# MeshctCLI REQUIRES Node.js 18.17+ and never installs it for you. If Node.js is missing or too
 # old, this script stops. Otherwise it downloads mesh.cjs (a ~300 KB file), verifies its SHA-256
 # checksum, then runs "mesh install" (mesh command on your user PATH + Tab completion).
 $ErrorActionPreference = 'Stop'
@@ -21,7 +21,7 @@ if (-not $node) {
 }
 $nodeVersion = (& node -v).TrimStart('v')
 if ([version]($nodeVersion -replace '-.*$', '') -lt [version]'18.17.0') {
-    Write-Host " FAIL   Node.js v$nodeVersion is too old; MeshCLI needs 18.17 or newer." -ForegroundColor Red
+    Write-Host " FAIL   Node.js v$nodeVersion is too old; MeshctCLI needs 18.17 or newer." -ForegroundColor Red
     Write-Host '        Update it from https://nodejs.org/ and run this again.'
     return
 }
@@ -31,7 +31,7 @@ $tmp = Join-Path ([IO.Path]::GetTempPath()) ("meshcli-" + [Guid]::NewGuid().ToSt
 New-Item -ItemType Directory -Path $tmp | Out-Null
 try {
     $file = Join-Path $tmp 'mesh.cjs'
-    Write-Host "  INFO  Using Node.js v$nodeVersion. Downloading MeshCLI ..."
+    Write-Host "  INFO  Using Node.js v$nodeVersion. Downloading MeshctCLI ..."
     Invoke-WebRequest "$base/mesh.cjs" -OutFile $file -UseBasicParsing
     # Download to a file: GitHub serves .sha256 as application/octet-stream, so "(Invoke-WebRequest).Content"
     # is a byte[] in Windows PowerShell and cannot be compared as text.
