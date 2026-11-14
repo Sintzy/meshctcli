@@ -35,8 +35,9 @@ $ mesh                                          # no argument: pick a device wit
 
 ## Install
 
-No Node.js needed. The installer downloads the executable for your OS and CPU, verifies its
-SHA-256 checksum, adds it to your `PATH` and sets up Tab completion.
+**Requires [Node.js](https://nodejs.org/) 18.17 or newer.** MeshCLI never installs or downloads Node.js:
+if it is missing or too old, the installer stops and tells you so. Otherwise it downloads one small file
+(about 300 KB), verifies its SHA-256 checksum, adds the `mesh` command to your `PATH` and sets up Tab completion.
 
 **macOS / Linux**
 
@@ -63,8 +64,8 @@ mesh list
 <details>
 <summary>Other ways to install, update and remove</summary>
 
-- **npm** (needs Node.js 18.17+): `npm install -g meshcentral-cli`
-- **From source**: `npm install && npm run build`, then `./dist/mesh-<os>-<arch> install`
+- **npm**: `npm install -g meshcentral-cli`
+- **From source**: `npm install && npm run build`, then `node dist/mesh.cjs install`
 - **Update**: run the installer again.
 - **Pin a version**: `MESHCLI_VERSION=v1.0.0` before the installer command.
 - **Remove**: `mesh uninstall` (add `--purge` to also delete profiles, stored logins and caches).
@@ -127,12 +128,12 @@ Limits: there is no URL parameter that starts the connection, so you click **Con
 npm install
 npm test                                     # unit tests + an in-process mock MeshCentral
 node scripts/integration.mjs <device> --write   # checks against YOUR server (cleans up after itself)
-npm run build                                # standalone executable for this machine -> dist/
+npm run build                                # single file dist/mesh.cjs
 ```
 
-Standalone executables are Node.js single-executable applications, so each platform is built on its own
-runner: pushing a tag `v*` runs [`release.yml`](.github/workflows/release.yml) and publishes them with the
-installer scripts. The code is split by concern (`src/mesh` protocol and devices, `src/session` shell,
+`npm run build` produces `dist/mesh.cjs`, one file that runs on every OS with Node.js 18.17+. Pushing a tag
+`v*` runs [`release.yml`](.github/workflows/release.yml): tests, build, a smoke test on Linux, macOS and
+Windows with Node 18 and 24, then the release with the installer scripts. The code is split by concern (`src/mesh` protocol and devices, `src/session` shell,
 files and tunnels, `src/auth` keyrings, `src/ui` terminal output, `src/commands`).
 
 What is and is not verified yet is tracked honestly in [TEST-RESULTS.md](TEST-RESULTS.md).

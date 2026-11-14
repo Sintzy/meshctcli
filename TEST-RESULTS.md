@@ -49,6 +49,7 @@ stopped and deleted afterwards.
 | bash completion function: devices, commands, file fallback | ✅ |
 | `mesh completion install/uninstall` (temporary HOME): one line added, idempotent, backup made, prototype line disabled | ✅ |
 | `npm pack` + `npm install -g` into a temporary prefix: `mesh` and `meshcli` work | ✅ |
+| Single-file install (`install.sh` against a local HTTP server, temporary HOME): refuses when Node is missing or too old (v16), installs the launcher, `mesh` runs, the launcher fails clearly if Node later disappears, `mesh uninstall --purge` leaves nothing behind | ✅ (macOS only; Windows `install.ps1`, `mesh.cmd` and PATH handling are untested) |
 
 ## 2b. Real production server (run by the project owner, 2026-11-14)
 

@@ -13,11 +13,25 @@ import { MeshError, UsageError, CancelledError } from '../errors.js';
 
 const PATH_MARKER = '# MeshCLI path';
 const isWindows = process.platform === 'win32';
-const exeName = isWindows ? 'mesh.exe' : 'mesh';
 
-export const defaultInstallDir = () => (isWindows
+/** Folder with the launcher (this folder goes on the PATH). */
+export const defaultBinDir = () => (isWindows
   ? path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'Programs', 'MeshCLI')
   : path.join(os.homedir(), '.local', 'bin'));
+
+/** Folder with mesh.cjs. On Windows it is the same folder as the launcher. */
+export const defaultLibDir = () => (isWindows
+  ? defaultBinDir()
+  : path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share'), 'meshcli'));
+
+/** Text of the launcher that runs mesh.cjs with the Node.js found on the PATH. Node is required, never bundled. */
+export function launcherScript(libFile, platform = process.platform) {
+  if (platform === 'win32') {
+    return `@echo off\r\nwhere node >nul 2>nul || (echo  FAIL   Node.js 18.17 or newer is required: https://nodejs.org/ 1>&2 & exit /b 1)\r\nnode "${libFile}" %*\r\n`;
+  }
+  const q = libFile.replace(/(["\\$`])/g, '\\$1');
+  return `#!/bin/sh\ncommand -v node >/dev/null 2>&1 || { echo " FAIL   Node.js 18.17 or newer is required: https://nodejs.org/" >&2; exit 1; }\nexec node "${q}" "$@"\n`;
+}
 
 const onPath = (dir) => (process.env.PATH || '').split(path.delimiter).some((p) => p && path.resolve(p) === path.resolve(dir));
 
@@ -67,32 +81,34 @@ function removeFromPath(dir) {
 
 export const installCmd = {
   name: 'install',
-  summary: 'Install this executable as "mesh" on your PATH, with Tab completion',
+  summary: 'Install the "mesh" command (needs Node.js) and Tab completion',
   usage: 'mesh install [--dir folder] [--no-completion]',
   options: { dir: { type: 'string' }, 'no-completion': { type: 'boolean' } },
   async run(_ctx, { opts }) {
-    if (!process.env.MESHCLI_BUNDLED) throw new UsageError('"mesh install" is only for the standalone executable.', { hint: 'You are running from source/npm; use "npm install -g ." and "mesh completion install" instead.' });
-    const dir = path.resolve(opts.dir || defaultInstallDir());
-    const dest = path.join(dir, exeName);
-    t.title('MeshCLI', `Installing to ${dir}`);
-    fs.mkdirSync(dir, { recursive: true });
-    if (path.resolve(process.execPath) !== dest) {
-      const tmp = `${dest}.new`;
-      fs.copyFileSync(process.execPath, tmp);
-      fs.chmodSync(tmp, 0o755);
-      try { fs.renameSync(tmp, dest); } catch (err) {
-        fs.rmSync(tmp, { force: true });
-        throw new MeshError(`Cannot replace ${dest}: ${err.message}`, { hint: 'Close other running "mesh" sessions and try again.' });
-      }
+    const self = process.argv[1];
+    if (!process.env.MESHCLI_BUNDLED || !self || !fs.existsSync(self)) {
+      throw new UsageError('"mesh install" is only for the downloaded mesh.cjs file.', { hint: 'From source or npm use "npm install -g ." and "mesh completion install" instead.' });
     }
-    t.status('ok', `Installed ${dest}`);
-    if (!onPath(dir)) for (const a of addToPath(dir)) t.status('ok', a);
+    const binDir = path.resolve(opts.dir || defaultBinDir());
+    const libDir = opts.dir && !isWindows ? binDir : defaultLibDir();
+    const libFile = path.join(libDir, 'mesh.cjs');
+    const launcher = path.join(binDir, isWindows ? 'mesh.cmd' : 'mesh');
+    t.title('MeshCLI', `Installing to ${binDir}`);
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(libDir, { recursive: true });
+    if (path.resolve(self) !== libFile) fs.copyFileSync(self, libFile);
+    const tmp = `${launcher}.new`;
+    fs.writeFileSync(tmp, launcherScript(libFile), { mode: 0o755 });
+    fs.renameSync(tmp, launcher);
+    t.status('ok', `Installed ${launcher}`);
+    t.detail(`Runs with Node.js ${process.version} (found on your PATH at run time)`, 7);
+    if (!onPath(binDir)) for (const a of addToPath(binDir)) t.status('ok', a);
     if (!opts['no-completion']) {
       const r = installCompletion();
       for (const a of r.actions) t.status('ok', a);
     }
     t.result('ok', 'MeshCLI installed.');
-    t.detail(`Open a new terminal, then run: mesh configure${onPath(dir) ? '' : '   (PATH changes apply to new terminals)'}`, 7);
+    t.detail(`Open a new terminal, then run: mesh configure${onPath(binDir) ? '' : '   (PATH changes apply to new terminals)'}`, 7);
   },
 };
 
@@ -119,11 +135,12 @@ export const uninstallCmd = {
   usage: 'mesh uninstall [--purge] [--yes]',
   options: { purge: { type: 'boolean' } },
   async run(_ctx, { opts }) {
-    const dir = path.dirname(process.execPath);
+    const self = process.argv[1] || '';
     const bundled = Boolean(process.env.MESHCLI_BUNDLED);
+    const binDir = defaultBinDir();
     if (!opts.yes) {
       if (!isInteractive()) throw new UsageError('Refusing to uninstall without confirmation.', { hint: 'Pass --yes.' });
-      t.print(`This removes ${bundled ? process.execPath : 'shell integration'}, the PATH entry and Tab completion${opts.purge ? `, ${t.c.bold('all profiles, stored logins and caches')}` : ''}.`);
+      t.print(`This removes ${bundled ? 'the mesh command' : 'shell integration'}, the PATH entry and Tab completion${opts.purge ? `, ${t.c.bold('all profiles, stored logins and caches')}` : ''}.`);
       if (!(await confirm('Continue?', { default: false }))) throw new CancelledError();
     }
     const actions = [];
@@ -137,9 +154,14 @@ export const uninstallCmd = {
       if (fs.existsSync(paths.config)) { fs.rmSync(paths.config, { recursive: true, force: true }); actions.push(`removed ${paths.config}`); }
     }
     if (bundled) {
-      actions.push(...removeFromPath(dir));
-      if (isWindows) actions.push(`delete ${process.execPath} manually after this window closes (Windows keeps running programs locked)`);
-      else { fs.rmSync(process.execPath, { force: true }); actions.push(`removed ${process.execPath}`); }
+      const launcher = path.join(binDir, isWindows ? 'mesh.cmd' : 'mesh');
+      if (fs.existsSync(launcher)) { fs.rmSync(launcher, { force: true }); actions.push(`removed ${launcher}`); }
+      const libFile = path.join(defaultLibDir(), 'mesh.cjs');
+      if (path.resolve(self) !== libFile || !isWindows) {
+        if (fs.existsSync(libFile)) { fs.rmSync(libFile, { force: true }); actions.push(`removed ${libFile}`); }
+        if (!isWindows) { try { fs.rmdirSync(defaultLibDir()); } catch { /* not empty or gone */ } }
+      } else actions.push(`delete ${libFile} manually after this window closes (Windows keeps running programs locked)`);
+      actions.push(...removeFromPath(binDir));
     }
     for (const a of actions) t.status('ok', a);
     t.result('ok', actions.length ? 'MeshCLI removed.' : 'Nothing to remove.');
