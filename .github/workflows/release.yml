@@ -1,4 +1,5 @@
-# Builds the standalone executables on each platform and publishes them as a GitHub release.
+# Builds the single-file distribution (mesh.cjs, runs on any OS with Node.js) and publishes it
+# together with the installer scripts.
 #   git tag v1.0.0 && git push --tags
 name: release
 on:
@@ -8,46 +9,49 @@ on:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { os: macos-latest,    test: true }   # darwin arm64
-          - { os: macos-15-intel,  test: true }   # darwin x64
-          - { os: ubuntu-24.04,    test: true }   # linux x64
-          - { os: ubuntu-24.04-arm, test: true }  # linux arm64
-          - { os: windows-latest,  test: false }  # win x64
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 24 }
       - run: npm ci
-      - if: matrix.test
-        run: npm test
+      - run: npm test
       - run: npm run build
-      - run: ./dist/mesh-* --version
-        shell: bash
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}
-          path: |
-            dist/mesh-*
-            !dist/mesh.cjs
+          name: mesh
+          path: dist/mesh.cjs*
+
+  smoke:            # the same file must work with the oldest and newest supported Node.js on every OS
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [18, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ matrix.node }}' }
+      - uses: actions/download-artifact@v4
+        with: { name: mesh }
+      - run: node mesh.cjs --version
+      - run: node mesh.cjs help
 
   publish:
-    needs: build
+    needs: smoke
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions: { contents: write }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
-        with: { path: artifacts, merge-multiple: true }
+        with: { name: mesh, path: artifacts }
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            artifacts/*
+            artifacts/mesh.cjs
+            artifacts/mesh.cjs.sha256
             scripts/install.sh
             scripts/install.ps1

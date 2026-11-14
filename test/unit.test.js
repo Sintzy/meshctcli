@@ -225,3 +225,17 @@ test('src/version.js matches package.json', async () => {
   const { VERSION } = await import('../src/version.js');
   assert.equal(VERSION, pkg.version);
 });
+
+test('launcher scripts require Node and never embed it', async () => {
+  const { launcherScript } = await import('../src/commands/selfinstall.js');
+  const unix = launcherScript('/home/u/.local/share/meshcli/mesh.cjs', 'linux');
+  assert.match(unix, /^#!\/bin\/sh\n/);
+  assert.match(unix, /command -v node/);
+  assert.match(unix, /Node\.js 18\.17 or newer is required/);
+  assert.match(unix, /exec node "\/home\/u\/\.local\/share\/meshcli\/mesh\.cjs" "\$@"/);
+  assert.match(launcherScript('/a "b"/$x/mesh.cjs', 'linux'), /exec node "\/a \\"b\\"\/\\\$x\/mesh\.cjs"/);
+  const win = launcherScript('C:\\Users\\u\\AppData\\Local\\Programs\\MeshCLI\\mesh.cjs', 'win32');
+  assert.match(win, /where node/);
+  assert.match(win, /node "C:\\Users\\u\\AppData\\Local\\Programs\\MeshCLI\\mesh\.cjs" %\*/);
+  assert.ok(win.includes('\r\n'));
+});
