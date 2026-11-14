@@ -25,6 +25,7 @@ export const paths = {
   get completionDir() { return path.join(configDir(), 'completion'); },
   get browserProfile() { return path.join(configDir(), 'browser-profile'); },
   get insecureCredentials() { return path.join(configDir(), 'credentials.json'); },
+  get dpapiCredentials() { return path.join(configDir(), 'credentials.dpapi.json'); },
 };
 
 /** Create a directory readable only by the current user. */
