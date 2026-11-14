@@ -77,9 +77,20 @@ elseif ($op -eq 'set') { $s = [Console]::In.ReadToEnd(); [MeshCliCred]::Write($t
 elseif ($op -eq 'delete') { if (-not [MeshCliCred]::CredDelete($target, 1, 0)) { exit 44 } }
 `;
 
+/** Windows PowerShell wraps errors in CLIXML when run with -EncodedCommand; turn that back into one readable line. */
+export function cleanPsError(stderr) {
+  const text = String(stderr || '').trim();
+  if (!text.startsWith('#< CLIXML')) return text;
+  const parts = [...text.matchAll(/<S S="Error">([\s\S]*?)<\/S>/g)].map((m) => m[1]);
+  const joined = parts.join('').replace(/_x000D__x000A_/g, ' ').replace(/_x([0-9A-Fa-f]{4})_/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  const first = joined.split(/ At line:\d+/)[0].trim();
+  return first || 'PowerShell reported an error';
+}
+
 function winRun(op, account, input) {
   const encoded = Buffer.from(WIN_HELPER, 'utf16le').toString('base64');
-  return run('powershell.exe', ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', encoded], {
+  return run('powershell.exe', ['-NoProfile', '-NonInteractive', '-OutputFormat', 'Text', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', encoded], {
     input,
     env: { ...process.env, MESHCLI_CRED_OP: op, MESHCLI_CRED_TARGET: `${SERVICE}:${assertSafe(account)}`, MESHCLI_CRED_USER: account },
   });
@@ -92,14 +103,65 @@ const windows = {
   get(account) {
     const r = winRun('get', account);
     if (r.status === 44) return null;
-    if (r.status !== 0) throw new MeshError(`Credential Manager read failed: ${r.stderr.trim() || `exit ${r.status}`}`);
+    if (r.status !== 0) throw new MeshError(`Credential Manager read failed: ${cleanPsError(r.stderr) || `exit ${r.status}`}`);
     return decode(r.stdout);
   },
   set(account, secret) {
     const r = winRun('set', account, encode(secret));
-    if (r.status !== 0) throw new MeshError(`Credential Manager write failed: ${r.stderr.trim() || `exit ${r.status}`}`);
+    if (r.status !== 0) throw new MeshError(`Credential Manager write failed: ${cleanPsError(r.stderr) || `exit ${r.status}`}`);
   },
   delete(account) { return winRun('delete', account).status === 0; },
+};
+
+// ---------------------------------------------------------------- Windows DPAPI (fallback)
+// Credential Manager refuses writes in some logon sessions (error 1312, e.g. network/SSH logons).
+// DPAPI encrypts with a key bound to the current Windows user; the ciphertext lives in a file.
+const DPAPI_HELPER = String.raw`
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Security
+$in = [Console]::In.ReadToEnd().Trim()
+$scope = [Security.Cryptography.DataProtectionScope]::CurrentUser
+if ($env:MESHCLI_DPAPI_OP -eq 'protect') {
+  [Console]::Out.Write([Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Protect([Text.Encoding]::UTF8.GetBytes($in), $null, $scope)))
+} else {
+  [Console]::Out.Write([Text.Encoding]::UTF8.GetString([Security.Cryptography.ProtectedData]::Unprotect([Convert]::FromBase64String($in), $null, $scope)))
+}
+`;
+
+function dpapiRun(op, input) {
+  const encoded = Buffer.from(DPAPI_HELPER, 'utf16le').toString('base64');
+  return run('powershell.exe', ['-NoProfile', '-NonInteractive', '-OutputFormat', 'Text', '-ExecutionPolicy', 'Bypass', '-EncodedCommand', encoded], {
+    input, env: { ...process.env, MESHCLI_DPAPI_OP: op },
+  });
+}
+function readDpapiStore() {
+  try { return JSON.parse(fs.readFileSync(paths.dpapiCredentials, 'utf8')); } catch { return {}; }
+}
+const dpapi = {
+  name: 'Windows DPAPI (encrypted for your Windows user)',
+  id: 'dpapi',
+  available: () => process.platform === 'win32',
+  get(account) {
+    const cipher = readDpapiStore()[account];
+    if (!cipher) return null;
+    const r = dpapiRun('unprotect', cipher);
+    if (r.status !== 0) throw new MeshError(`DPAPI decryption failed: ${cleanPsError(r.stderr) || `exit ${r.status}`}`, { hint: 'The credential can only be read by the Windows user that stored it. Run "mesh login" again.' });
+    return decode(r.stdout);
+  },
+  set(account, secret) {
+    const r = dpapiRun('protect', encode(secret));
+    if (r.status !== 0 || !r.stdout.trim()) throw new MeshError(`DPAPI encryption failed: ${cleanPsError(r.stderr) || `exit ${r.status}`}`);
+    const all = readDpapiStore();
+    all[account] = r.stdout.trim();
+    writePrivateFile(paths.dpapiCredentials, JSON.stringify(all, null, 2));
+  },
+  delete(account) {
+    const all = readDpapiStore();
+    if (!(account in all)) return false;
+    delete all[account];
+    writePrivateFile(paths.dpapiCredentials, JSON.stringify(all, null, 2));
+    return true;
+  },
 };
 
 // ---------------------------------------------------------------- Linux (Secret Service)
@@ -143,7 +205,9 @@ const file = {
   },
 };
 
-export const BACKENDS = { keychain: macos, wincred: windows, 'secret-service': linux, file };
+export const BACKENDS = { keychain: macos, wincred: windows, dpapi, 'secret-service': linux, file };
+/** Secure alternative to try when the primary OS keyring refuses to store (null when there is none). */
+export function fallbackKeyring(primary) { return primary?.id === 'wincred' ? dpapi : null; }
 
 /** The secure OS backend for this machine, or null if none is usable. */
 export function systemKeyring() {

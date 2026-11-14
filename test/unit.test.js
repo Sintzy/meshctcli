@@ -239,3 +239,11 @@ test('launcher scripts require Node and never embed it', async () => {
   assert.match(win, /node "C:\\Users\\u\\AppData\\Local\\Programs\\MeshCLI\\mesh\.cjs" %\*/);
   assert.ok(win.includes('\r\n'));
 });
+
+test('PowerShell CLIXML errors become one readable line', async () => {
+  const { cleanPsError } = await import('../src/auth/keyring.js');
+  const clixml = '#< CLIXML\r\n<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><MS><I64 N="SourceId">1</I64></MS></Obj><S S="Error">Exception calling "Write" with "3" argument(s): "A specified logon session does not exist. It may already have been _x000D__x000A_</S><S S="Error">terminated"_x000D__x000A_</S><S S="Error">At line:24 char:58_x000D__x000A_</S><S S="Error">+ ... eadToEnd(); [MeshCliCred]::Write(_x000D__x000A_</S></Objs>';
+  assert.equal(cleanPsError(clixml), 'Exception calling "Write" with "3" argument(s): "A specified logon session does not exist. It may already have been terminated"');
+  assert.equal(cleanPsError('plain error\n'), 'plain error');
+  assert.equal(cleanPsError(''), '');
+});

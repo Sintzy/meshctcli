@@ -5,7 +5,7 @@ import { loadConfig, saveConfig, resolveProfile, validateProfileName, PROFILE_DE
 import { normalizeServerUrl, hostLabel } from '../mesh/url.js';
 import { probeCertificate, leafFingerprint, normalizeFingerprint } from '../mesh/tls.js';
 import { MeshClient } from '../mesh/client.js';
-import { systemKeyring, BACKENDS } from '../auth/keyring.js';
+import { systemKeyring, BACKENDS, fallbackKeyring } from '../auth/keyring.js';
 import { loadStored, saveStored, deleteStored, resolveCredentials, backendFor } from '../auth/credentials.js';
 import { readDeviceCache, clearDeviceCache } from '../mesh/cache.js';
 import { installedBrowsers, BROWSERS } from '../browser/browser.js';
@@ -213,13 +213,30 @@ export const login = {
       }
     }
 
-    // Revoke the token this profile used before, so tokens do not pile up on the server.
+    // Store first; only then revoke the old token, so a storage failure never leaves the user with neither.
+    try {
+      saveStored(name, profile, record, backend);
+    } catch (err) {
+      t.status('warn', `${backend.name} could not store the credential: ${err.message}`);
+      const alt = fallbackKeyring(backend);
+      let stored = false;
+      if (alt) {
+        try { saveStored(name, profile, record, alt); backend = alt; stored = true; t.status('ok', `Stored with ${alt.name} instead.`); } catch (err2) { t.status('warn', `${alt.name}: ${err2.message}`); }
+      }
+      if (!stored) {
+        if (opts['insecure-store'] || (isInteractive() && await confirm('Store the credential in a file readable only by you (not encrypted)?', { default: false }))) {
+          saveStored(name, profile, record, BACKENDS.file);
+          backend = BACKENDS.file;
+        } else {
+          client.close();
+          throw new MeshError('Credentials could not be stored.', { hint: 'Use MESHCLI_USER / MESHCLI_PASSWORD for automation, or run "mesh login --insecure-store".' });
+        }
+      }
+    }
     if (previous?.kind === 'token' && previous.user !== record.user) {
       try { await client.listLoginTokens({ remove: [previous.user] }); t.status('ok', 'Previous MeshCLI login token revoked.'); } catch { /* non fatal */ }
     }
     client.close();
-
-    saveStored(name, profile, record, backend);
     if (record.kind === 'token') {
       await withSpinner('Verifying the stored token…', async () => {
         const check = await MeshClient.connect({ profile, auth: { user: record.user, password: record.secret } });
